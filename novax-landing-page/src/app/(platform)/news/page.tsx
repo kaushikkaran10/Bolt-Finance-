@@ -27,6 +27,27 @@ interface SummaryStats {
   fetched_at: string;
 }
 
+// ── Offline Dummy Data for Simulation ──────────────────────────────────────
+const ALL_DUMMY_ARTICLES = [
+  { id: "1", title: "Federal Reserve Signals Further Rate Cuts Ahead, Boosting Risk Assets", summary: "Fed Chair Powell indicated the central bank is prepared to cut rates two more times in 2025 if inflation continues its downward trajectory, sending equities and crypto markets sharply higher.", sentiment: "positive", impact: "High", source: "Financial Times", published_at: new Date(Date.now() - 1000*60*5).toISOString(), url: "#" },
+  { id: "2", title: "NVIDIA Reports Record Q1 Revenue of $26B, AI Chip Demand Surges", summary: "NVIDIA beat Wall Street estimates by 18%, driven by insatiable demand for H100 and Blackwell chips from hyperscalers. Data center revenue grew 427% year-over-year.", sentiment: "positive", impact: "High", source: "Bloomberg", published_at: new Date(Date.now() - 1000*60*45).toISOString(), url: "#" },
+  { id: "3", title: "Tech Giants Report Slower Cloud Growth Amid Enterprise Budget Tightening", summary: "AWS, Azure, and Google Cloud all reported deceleration in cloud growth rates, missing consensus estimates. CFOs cite macro uncertainty as a key driver of spending caution.", sentiment: "negative", impact: "Medium", source: "Reuters", published_at: new Date(Date.now() - 1000*60*120).toISOString(), url: "#" },
+  { id: "4", title: "Bitcoin Surpasses $65,000 as ETF Inflows Accelerate", summary: "Spot Bitcoin ETFs saw combined inflows of $843M in a single day, the highest since launch week, suggesting institutional appetite for crypto exposure remains voracious.", sentiment: "positive", impact: "High", source: "CoinDesk", published_at: new Date(Date.now() - 1000*60*180).toISOString(), url: "#" },
+  { id: "5", title: "Oil Prices Stabilize After Three Weeks of Volatility", summary: "Brent crude settled at $83.40 per barrel after OPEC+ confirmed production cuts would remain in place through Q3 2025. Markets expect range-bound trading heading into summer.", sentiment: "neutral", impact: "Low", source: "Reuters", published_at: new Date(Date.now() - 1000*60*240).toISOString(), url: "#" },
+  { id: "6", title: "Tesla's FSD V12.4 Passes Regulatory Audit in California", summary: "California DMV has approved Tesla's Full Self-Driving for expanded testing after 1M+ mile audit showed a 3× improvement in disengagement rates over prior versions.", sentiment: "positive", impact: "Medium", source: "Electrek", published_at: new Date(Date.now() - 1000*60*300).toISOString(), url: "#" },
+  { id: "7", title: "China PMI Drops Below 50, Deflationary Pressures Mount", summary: "China's manufacturing PMI fell to 49.1 in April, signaling a contraction in factory activity. Analysts warn of renewed deflationary spiral that could pressure global equities.", sentiment: "negative", impact: "High", source: "WSJ", published_at: new Date(Date.now() - 1000*60*360).toISOString(), url: "#" },
+  { id: "8", title: "Apple Plans $110B Buyback, Largest in Corporate History", summary: "Apple Inc. announced a record share repurchase program with a Buffett-endorsed stamp of approval, signaling immense confidence in future FCF generation.", sentiment: "positive", impact: "Medium", source: "CNBC", published_at: new Date(Date.now() - 1000*60*420).toISOString(), url: "#" }
+] as Article[];
+
+// These articles will be pushed one by one every 25 seconds
+const INCOMING_ARTICLES = [
+  { id: "9", title: "URGENT: SEC Approves First Solana Spot ETF Application", summary: "In a surprise move, the SEC has greenlit the first spot ETF for Solana, sending SOL prices surging 15% in minutes.", sentiment: "positive", impact: "High", source: "CryptoBriefing", published_at: new Date().toISOString(), url: "#" },
+  { id: "10", title: "Global Supply Chain Disruption as Major Port Strike Begins", summary: "Thousands of dockworkers have walked out across multiple East Coast ports, threatening severe logistical bottlenecks going into Q3.", sentiment: "negative", impact: "High", source: "Wall Street Journal", published_at: new Date().toISOString(), url: "#" },
+  { id: "11", title: "OpenAI Announces GPT-5, Claiming AGI Milestones Reached", summary: "Sam Altman revealed the next iteration of their flagship model, stating it exhibits reasoning capabilities fundamentally beyond human experts in specific scientific domains.", sentiment: "neutral", impact: "High", source: "The Verge", published_at: new Date().toISOString(), url: "#" }
+] as Article[];
+
+const SENTIMENT_SUMMARY: SummaryStats = { total: 148, positive: 89, negative: 31, neutral: 28, fetched_at: new Date().toISOString() };
+
 const FILTERS = ["All", "Positive", "Negative", "Neutral", "High Impact"];
 
 function timeAgo(isoDate: string) {
@@ -37,98 +58,90 @@ function timeAgo(isoDate: string) {
   return new Date(isoDate).toLocaleDateString();
 }
 
+// Custom Toast component to sync audio playback EXACTLY with DOM render
+const NewsToast = ({ 
+  t, 
+  article, 
+  playSound, 
+  setArticles 
+}: { 
+  t: any, 
+  article: Article, 
+  playSound: () => void,
+  setArticles: React.Dispatch<React.SetStateAction<Article[]>>
+}) => {
+  useEffect(() => {
+    if (t.visible) {
+      playSound();
+      // Push the new article to the front of the list exactly as the toast renders
+      setArticles(prev => [article, ...prev]);
+    }
+  }, [t.visible, playSound, article, setArticles]);
+
+  return (
+    <div className={`glass-panel p-4 rounded-xl border border-brand/30 shadow-[0_0_20px_rgba(0,255,136,0.3)] min-w-[300px] flex items-start gap-4 ${t.visible ? 'animate-in slide-in-from-top-4 fade-in duration-300' : 'animate-out slide-out-to-right-4 fade-out duration-300'}`}>
+       <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center shrink-0 border border-brand/20">
+         <AlertCircle className="w-5 h-5 text-brand" />
+       </div>
+       <div>
+          <h4 className="text-white font-bold text-sm mb-1 line-clamp-1">{article.title}</h4>
+          <p className="text-gray-400 text-xs font-mono">{article.source} • {article.impact} Impact</p>
+       </div>
+    </div>
+  );
+};
+
 export default function NewsIntelligencePage() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [stats, setStats] = useState<SummaryStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [articles, setArticles] = useState<Article[]>(ALL_DUMMY_ARTICLES);
+  const [stats, setStats] = useState<SummaryStats | null>(SENTIMENT_SUMMARY);
+  const [loading, setLoading] = useState(false); // No loading required for offline mode
   const [error, setError] = useState<string | null>(null);
   
-  // Track the most recent timestamp to trigger notifications for NEW articles
-  const latestSeenTimestamp = useRef<number>(0);
+  // Ref for the unused incoming articles queue
+  const queueRef = useRef(INCOMING_ARTICLES);
 
-  const fetchNews = async (isBackgroundPoll = false) => {
+  // Play a clean UI "pop/ding" sound
+  const playNotificationSound = () => {
     try {
-      // 1. Fetch articles array with aggressive timeout
-      const res = await apiClient.get("/news/");
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
       
-      if (!Array.isArray(res.data)) {
-        throw new Error("Backend did not return an array of articles.");
-      }
-
-      const newArticles: Article[] = res.data.map((a: any) => ({
-        id: a.url || Math.random().toString(),
-        title: a.title || "Untitled Article",
-        summary: a.description,
-        sentiment: a.sentiment || "neutral",
-        sentiment_score: a.sentiment_score || 0,
-        impact: a.impact || "Low",
-        source: a.source || "Unknown API",
-        url: a.url || "#",
-        published_at: a.published_at || new Date().toISOString(),
-        fetched_at: a.fetched_at || new Date().toISOString(),
-      }));
-
-      // 2. Fetch sentiment summary stats separately (non-blocking if it fails)
-      let newStats: SummaryStats | null = null;
-      try {
-        const statsRes = await apiClient.get("/news/sentiment");
-        newStats = {
-          total: statsRes.data.total_articles || 0,
-          positive: statsRes.data.positive_count || 0,
-          negative: statsRes.data.negative_count || 0,
-          neutral: statsRes.data.neutral_count || 0,
-          fetched_at: new Date().toISOString(),
-        };
-      } catch (statErr) {
-        console.warn("Could not fetch sentiment summary:", statErr);
-      }
-
-      // Find if we have any NEW articles missing from our current state
-      if (articles.length > 0 && isBackgroundPoll) {
-        const currentUrls = new Set(articles.map(a => a.url));
-        const newlyDiscovered = newArticles.filter(a => !currentUrls.has(a.url));
-        
-        if (newlyDiscovered.length > 0) {
-          // Trigger a POP-UP notification for the most impactful new article!
-          const impactful = newlyDiscovered.find(a => a.impact === "High") || newlyDiscovered[0];
-          
-          toast.custom((t) => (
-            <div className={`glass-panel p-4 rounded-xl border border-brand/30 shadow-[0_0_20px_rgba(0,255,136,0.3)] min-w-[300px] flex items-start gap-4 ${t.visible ? 'animate-in slide-in-from-top-4 fade-in duration-300' : 'animate-out slide-out-to-right-4 fade-out duration-300'}`}>
-               <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center shrink-0 border border-brand/20">
-                 <AlertCircle className="w-5 h-5 text-brand" />
-               </div>
-               <div>
-                  <h4 className="text-white font-bold text-sm mb-1 line-clamp-1">{impactful.title}</h4>
-                  <p className="text-gray-400 text-xs font-mono">{impactful.source} • {impactful.impact} Impact</p>
-               </div>
-            </div>
-          ), { duration: 5000, position: 'top-right' });
-        }
-      }
-
-      setArticles(newArticles);
-      if (newStats) setStats(newStats);
-      setError(null);
-    } catch (err: any) {
-      console.error("Failed to fetch news:", err);
-      if (!isBackgroundPoll) {
-        setError(err.message || "Failed to connect to the News Intelligence backend.");
-      }
-    } finally {
-      setLoading(false);
+      const audioCtx = new AudioContextClass();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      // Pleasant "ding" setting
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+      oscillator.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); // A6 note
+      
+      // Volume envelope (quick attack, natural decay)
+      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+      
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.5);
+    } catch (e) {
+      console.warn("Audio Context playback failed", e);
     }
   };
 
   useEffect(() => {
-    // Initial fetch
-    fetchNews();
-
-    // Set up 15-second real-time polling loop
+    // Simulate real-time news arriving every 25 seconds
     const intervalId = setInterval(() => {
-      fetchNews(true);
-    }, 15000);
+      if (queueRef.current.length > 0) {
+        const nextArticle = queueRef.current.shift()!;
+        
+        // Trigger the Toast Notification!
+        toast.custom((t) => <NewsToast t={t} article={nextArticle} playSound={playNotificationSound} setArticles={setArticles} />, { duration: 5000, position: 'top-right' });
+      }
+    }, 25000); // Trigger every 25 seconds
 
     return () => clearInterval(intervalId);
   }, []);
@@ -210,7 +223,7 @@ export default function NewsIntelligencePage() {
           </div>
           <div className="relative z-10">
             <div className="text-xs text-brand bg-brand/10 inline-flex px-2 py-1 rounded border border-brand/20 animate-pulse">
-              Live Connection: Active (Polled 15s)
+              Simulated Offline Demo (25s Pulse)
             </div>
           </div>
         </div>

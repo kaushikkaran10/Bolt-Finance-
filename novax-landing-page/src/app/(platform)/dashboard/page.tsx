@@ -158,7 +158,6 @@ export default function DashboardPage() {
           <p className="text-gray-400 font-mono text-sm">Here&apos;s your live portfolio overview for today.</p>
         </div>
         <div className="flex gap-3">
-          <MagneticButton variant="secondary" className="h-10 px-4 text-sm">Deposit Funds</MagneticButton>
           <MagneticButton className="h-10 px-4 text-sm group">
             <span className="flex items-center gap-2">
               Invest Now <ArrowUpRight className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
