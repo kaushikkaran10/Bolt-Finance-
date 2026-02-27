@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050f0a; /* Deep dark green-black */
+  --foreground: #f4fbf7; /* Off-white with green tint */
+
+  /* Brand Colors */
+  --brand-primary: #00ff88; /* Neon Green (Bolt) */
+  --brand-secondary: #00d2ff; /* Cyan for tech accents */
+  --brand-dark: #0a1f14; /* Elevated dark green panels */
+  --brand-muted: #1e382b; /* Borders/inactive */
+
+  /* Semantic */
+  --success: #00e676;
+  --danger: #ff3366;
+  --warning: #ffb300;
+
+  /* Radii */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-muted: var(--brand-muted);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    scroll-behavior: smooth; /* Will be overridden by smooth scroll wrapper if needed, but good baseline */
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* Custom Selection */
+  ::selection {
+    background: var(--brand-primary);
+    color: var(--background);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--background);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--brand-muted);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2a4d3a;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .glass-panel {
+    background: rgba(10, 31, 20, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+  .text-glow {
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+  }
+  .text-glow-hover {
+    transition: text-shadow 0.3s ease;
+  }
+  .text-glow-hover:hover {
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+  }
+}

@@ -1,0 +1,10 @@
+# === ML Worker Requirements ===
+# Only install this on the Celery ML worker.
+# These are huge packages (TF=615MB, torch=2.5GB, transformers=500MB).
+
+-r requirements-api.txt
+
+# ML/DL
+tensorflow==2.18.0
+torch==2.5.1
+transformers==4.47.1

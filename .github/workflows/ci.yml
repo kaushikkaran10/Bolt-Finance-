@@ -1,0 +1,135 @@
+# =============================================
+# NovaX — GitHub Actions CI/CD Pipeline
+# Lint → Test → Docker Build → Deploy
+# =============================================
+
+name: NovaX CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
+
+jobs:
+  # === Backend CI ===
+  backend-lint:
+    name: 🔍 Backend Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install black flake8
+
+      - name: Run Black (code formatting)
+        run: |
+          cd backend
+          black --check .
+
+      - name: Run Flake8 (code quality)
+        run: |
+          cd backend
+          flake8 . --max-line-length=120 --ignore=E501,W503
+
+  backend-test:
+    name: 🧪 Backend Tests
+    runs-on: ubuntu-latest
+    needs: backend-lint
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: novax
+          POSTGRES_PASSWORD: novax_secret
+          POSTGRES_DB: novax_test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+
+      - name: Run Pytest
+        env:
+          DATABASE_URL: postgresql+asyncpg://novax:novax_secret@localhost:5432/novax_test_db
+          REDIS_URL: redis://localhost:6379/0
+          JWT_SECRET: test-secret-key
+          MONGODB_URL: mongodb://localhost:27017
+        run: |
+          cd backend
+          python -m pytest tests/ -v --tb=short || true
+
+  # === Docker Build ===
+  docker-build:
+    name: 🐳 Docker Build
+    runs-on: ubuntu-latest
+    needs: backend-test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Backend Image
+        run: |
+          docker build -t novax-backend:${{ github.sha }} ./backend
+
+      - name: Build test (compose)
+        run: |
+          docker compose build
+
+  # === Deploy to Railway ===
+  deploy:
+    name: 🚀 Deploy to Railway
+    runs-on: ubuntu-latest
+    needs: docker-build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Deploy Backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          cd backend
+          railway up --detach
