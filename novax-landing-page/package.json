@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "preinstall": "npm config set legacy-peer-deps true"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
