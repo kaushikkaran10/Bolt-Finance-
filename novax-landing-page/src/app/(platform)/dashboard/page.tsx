@@ -1,8 +1,9 @@
 "use client";
 
 import { MagneticButton } from "@/components/ui/magnetic-button";
-import { ArrowUpRight, TrendingUp, Activity, Wallet, BarChart2, Zap } from "lucide-react";
+import { ArrowUpRight, TrendingUp, Activity, Wallet, BarChart2, Zap, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
+import { toast, Toaster } from "react-hot-toast";
 
 // The demo portfolio allocation
 const PORTFOLIO = {
@@ -151,6 +152,7 @@ export default function DashboardPage() {
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700">
+      <Toaster />
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -158,7 +160,22 @@ export default function DashboardPage() {
           <p className="text-gray-400 font-mono text-sm">Here&apos;s your live portfolio overview for today.</p>
         </div>
         <div className="flex gap-3">
-          <MagneticButton className="h-10 px-4 text-sm group">
+          <MagneticButton 
+            className="h-10 px-4 text-sm group"
+            onClick={() => {
+              toast.custom((t) => (
+                <div className={`${t.visible ? 'animate-in slide-in-from-top-4 fade-in duration-300' : 'animate-out slide-out-to-top-4 fade-out duration-300'} glass-panel p-4 rounded-xl border border-brand/30 shadow-[0_0_20px_rgba(0,255,136,0.2)] flex items-center gap-4`}>
+                  <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center shrink-0 border border-brand/20">
+                    <Clock className="w-5 h-5 text-brand" />
+                  </div>
+                  <div>
+                    <h4 className="text-white font-bold text-sm mb-1">Coming Soon</h4>
+                    <p className="text-gray-400 text-xs font-mono">Real-money trading features are currently in closed beta.</p>
+                  </div>
+                </div>
+              ), { duration: 3500, position: 'top-center' });
+            }}
+          >
             <span className="flex items-center gap-2">
               Invest Now <ArrowUpRight className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
             </span>

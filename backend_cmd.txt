@@ -1,0 +1,250 @@
+novax-backend  | 2026-03-27 08:10:38,987 INFO sqlalchemy.engine.Engine [cached since 0.007564s ago] ('holdings', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+novax-backend  | 2026-03-27 08:10:38,987 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+novax-backend  | FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+novax-backend  | WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+novax-backend  | 2026-03-27 08:10:38,987 INFO sqlalchemy.engine.Engine [cached since 0.00833s ago] ('holdings', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+novax-backend  | 2026-03-27 08:10:38,988 INFO sqlalchemy.engine.Engine COMMIT
+novax-backend  | 2026-03-27 08:10:38,988 INFO sqlalchemy.engine.Engine COMMIT
+novax-backend  | INFO:     Application startup complete.
+novax-backend  | INFO:     Application startup complete.
+novax-backend  |   ✅ PostgreSQL tables initialized
+novax-backend  |   ✅ Redis connected
+novax-backend  |   ✅ MongoDB connected
+novax-backend  | ✅ NovaX Backend started successfully
+novax-backend  | INFO:     127.0.0.1:59498 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:57598 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:33270 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | 2026-03-27 08:12:30,284 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+novax-backend  | 2026-03-27 08:12:30,291 INFO sqlalchemy.engine.Engine SELECT users.email, users.username, users.password_hash, users.wallet_address, users.firebase_uid, users.avatar_url, users.is_active, users.id, users.created_at, users.updated_at 
+novax-backend  | FROM users 
+novax-backend  | WHERE users.firebase_uid = $1::VARCHAR
+novax-backend  | 2026-03-27 08:12:30,292 INFO sqlalchemy.engine.Engine [generated in 0.00018s] ('oiTWJxkXwcW2hCB1IFeY96JFn1u2',)
+novax-backend  | 2026-03-27 08:12:30,295 INFO sqlalchemy.engine.Engine SELECT users.email, users.username, users.password_hash, users.wallet_address, users.firebase_uid, users.avatar_url, users.is_active, users.id, users.created_at, users.updated_at 
+novax-backend  | FROM users 
+novax-backend  | WHERE users.email = $1::VARCHAR
+novax-backend  | 2026-03-27 08:12:30,295 INFO sqlalchemy.engine.Engine [generated in 0.00016s] ('kaushikkaran0006@gmail.com',)
+novax-backend  | 2026-03-27 08:12:30,296 INFO sqlalchemy.engine.Engine SELECT users.email, users.username, users.password_hash, users.wallet_address, users.firebase_uid, users.avatar_url, users.is_active, users.id, users.created_at, users.updated_at 
+novax-backend  | FROM users 
+novax-backend  | WHERE users.username = $1::VARCHAR
+novax-backend  | 2026-03-27 08:12:30,296 INFO sqlalchemy.engine.Engine [generated in 0.00013s] ('kaushikkaran0006',)
+novax-backend  | 2026-03-27 08:12:30,298 INFO sqlalchemy.engine.Engine INSERT INTO users (email, username, password_hash, wallet_address, firebase_uid, avatar_url, is_active, id, created_at, updated_at) VALUES ($1::VARCHAR, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR, $7::BOOLEAN, $8::VARCHAR, $9::TIMESTAMP WITHOUT TIME ZONE, $10::TIMESTAMP WITHOUT TIME ZONE)
+novax-backend  | 2026-03-27 08:12:30,298 INFO sqlalchemy.engine.Engine [generated in 0.00018s] ('kaushikkaran0006@gmail.com', 'kaushikkaran0006', None, None, 'oiTWJxkXwcW2hCB1IFeY96JFn1u2', 'https://lh3.googleusercontent.com/a/ACg8ocLNFju9IyqdUAChGVTag5vulQq_SpWPAvcR9JXum1w6GThAJRw=s96-c', True, '9fbd2e4c-8718-44df-a8b1-7601c4e270aa', datetime.datetime(2026, 3, 27, 8, 12, 30, 298227), datetime.datetime(2026, 3, 27, 8, 12, 30, 298234))
+novax-backend  | 2026-03-27 08:12:30,302 INFO sqlalchemy.engine.Engine COMMIT
+novax-backend  | INFO:     172.18.0.1:38896 - "POST /api/auth/firebase HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:40990 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | 2026-03-27 08:12:56,488 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+novax-backend  | 2026-03-27 08:12:56,488 INFO sqlalchemy.engine.Engine SELECT users.email, users.username, users.password_hash, users.wallet_address, users.firebase_uid, users.avatar_url, users.is_active, users.id, users.created_at, users.updated_at 
+novax-backend  | FROM users 
+novax-backend  | WHERE users.firebase_uid = $1::VARCHAR
+novax-backend  | 2026-03-27 08:12:56,488 INFO sqlalchemy.engine.Engine [cached since 26.2s ago] ('oiTWJxkXwcW2hCB1IFeY96JFn1u2',)
+novax-backend  | 2026-03-27 08:12:56,491 INFO sqlalchemy.engine.Engine COMMIT
+novax-backend  | INFO:     172.18.0.1:34250 - "POST /api/auth/firebase HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:54950 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:47922 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:33602 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:53016 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:39328 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:34100 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:56446 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:45552 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:56240 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:35744 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:44810 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:46644 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:40344 - "GET /health HTTP/1.1" 200 OK
+novax-backend  |   ✅ PostgreSQL tables initialized
+novax-backend  |   ✅ Redis connected
+novax-backend  |   ✅ MongoDB connected
+novax-backend  | ✅ NovaX Backend started successfully
+novax-backend  | INFO:     127.0.0.1:38578 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:58468 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:46180 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:48030 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:51332 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:50746 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:52374 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:51300 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:56952 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:56984 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:56720 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | 2026-03-27 08:25:01,363 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+novax-backend  | 2026-03-27 08:25:01,372 INFO sqlalchemy.engine.Engine SELECT users.email, users.username, users.password_hash, users.wallet_address, users.firebase_uid, users.avatar_url, users.is_active, users.id, users.created_at, users.updated_at 
+novax-backend  | FROM users 
+novax-backend  | WHERE users.firebase_uid = $1::VARCHAR
+novax-backend  | 2026-03-27 08:25:01,372 INFO sqlalchemy.engine.Engine [generated in 0.00028s] ('oiTWJxkXwcW2hCB1IFeY96JFn1u2',)
+novax-backend  | 2026-03-27 08:25:01,376 INFO sqlalchemy.engine.Engine COMMIT
+novax-backend  | INFO:     172.18.0.1:34516 - "POST /api/auth/firebase HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:60906 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     ('172.18.0.1', 54700) - "WebSocket /api/v1/ws/community?room=general&username=User_1903&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZmJkMmU0Yy04NzE4LTQ0ZGYtYThiMS03NjAxYzRlMjcwYWEiLCJ0eXBlIjoiYWNjZXNzIiwianRpIjoiNTNhNzQ1MzItMjYwYS00NjYyLTk3NzItYzc4NjMzZTljZmM0IiwiZXhwIjoxNzc0NjAwODAxLCJpYXQiOjE3NzQ1OTk5MDF9.wzwFdULx6Qkve8MFHJTo9sUoOtxylYLC379zTAfto70" 403
+novax-backend  | INFO:     connection rejected (403 Forbidden)
+novax-backend  | INFO:     connection closed
+novax-backend  | INFO:     ('172.18.0.1', 54704) - "WebSocket /api/v1/ws/community?room=general&username=User_1903&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZmJkMmU0Yy04NzE4LTQ0ZGYtYThiMS03NjAxYzRlMjcwYWEiLCJ0eXBlIjoiYWNjZXNzIiwianRpIjoiNTNhNzQ1MzItMjYwYS00NjYyLTk3NzItYzc4NjMzZTljZmM0IiwiZXhwIjoxNzc0NjAwODAxLCJpYXQiOjE3NzQ1OTk5MDF9.wzwFdULx6Qkve8MFHJTo9sUoOtxylYLC379zTAfto70" 403
+novax-backend  | INFO:     connection rejected (403 Forbidden)
+novax-backend  | INFO:     connection closed
+novax-backend  | INFO:     127.0.0.1:60628 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:33496 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:35842 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:43232 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:59224 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:54136 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:43558 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:59636 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:51626 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:41020 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:45508 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:36566 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:53558 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:34868 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     ('172.18.0.1', 38576) - "WebSocket /api/v1/ws/community?room=general&username=User_1879&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZmJkMmU0Yy04NzE4LTQ0ZGYtYThiMS03NjAxYzRlMjcwYWEiLCJ0eXBlIjoiYWNjZXNzIiwianRpIjoiNTNhNzQ1MzItMjYwYS00NjYyLTk3NzItYzc4NjMzZTljZmM0IiwiZXhwIjoxNzc0NjAwODAxLCJpYXQiOjE3NzQ1OTk5MDF9.wzwFdULx6Qkve8MFHJTo9sUoOtxylYLC379zTAfto70" 403
+novax-backend  | INFO:     connection rejected (403 Forbidden)
+novax-backend  | INFO:     connection closed
+novax-backend  | INFO:     ('172.18.0.1', 38580) - "WebSocket /api/v1/ws/community?room=general&username=User_1879&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZmJkMmU0Yy04NzE4LTQ0ZGYtYThiMS03NjAxYzRlMjcwYWEiLCJ0eXBlIjoiYWNjZXNzIiwianRpIjoiNTNhNzQ1MzItMjYwYS00NjYyLTk3NzItYzc4NjMzZTljZmM0IiwiZXhwIjoxNzc0NjAwODAxLCJpYXQiOjE3NzQ1OTk5MDF9.wzwFdULx6Qkve8MFHJTo9sUoOtxylYLC379zTAfto70" 403
+novax-backend  | INFO:     connection rejected (403 Forbidden)
+novax-backend  | INFO:     connection closed
+novax-backend  | INFO:     127.0.0.1:39872 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:53438 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:50628 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:55682 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     172.18.0.1:52458 - "GET /api/predict/AAPL HTTP/1.1" 404 Not Found
+novax-backend  | INFO:     127.0.0.1:50798 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:57408 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:37292 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:51070 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:48150 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:60752 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:44226 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:41730 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:48012 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:39088 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     Received SIGTERM, exiting.
+novax-backend  | INFO:     Terminated child process [8]
+novax-backend  | INFO:     Terminated child process [9]
+novax-backend  | INFO:     Waiting for child process [8]
+novax-backend  | INFO:     Shutting down
+novax-backend  | INFO:     Shutting down
+novax-backend  | INFO:     Waiting for application shutdown.
+novax-backend  | INFO:     Waiting for application shutdown.
+novax-backend  | INFO:     Application shutdown complete.
+novax-backend  | INFO:     Finished server process [8]
+novax-backend  | INFO:     Application shutdown complete.
+novax-backend  | INFO:     Finished server process [9]
+novax-backend  | INFO:     Waiting for child process [9]
+novax-backend  | INFO:     Stopping parent process [1]
+novax-backend  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+novax-backend  | INFO:     Started parent process [1]
+novax-backend  | INFO:     Started server process [9]
+novax-backend  | INFO:     Waiting for application startup.
+novax-backend  | INFO:     Started server process [8]
+novax-backend  | INFO:     Waiting for application startup.
+novax-backend  | 2026-03-27 08:39:13,278 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+novax-backend  | 2026-03-27 08:39:13,278 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+novax-backend  | 2026-03-27 08:39:13,278 INFO sqlalchemy.engine.Engine [raw sql] ()
+novax-backend  | 2026-03-27 08:39:13,278 INFO sqlalchemy.engine.Engine [raw sql] ()
+novax-backend  | 2026-03-27 08:39:13,279 INFO sqlalchemy.engine.Engine select current_schema()
+novax-backend  | 2026-03-27 08:39:13,279 INFO sqlalchemy.engine.Engine select current_schema()
+novax-backend  | 2026-03-27 08:39:13,279 INFO sqlalchemy.engine.Engine [raw sql] ()
+novax-backend  | 2026-03-27 08:39:13,279 INFO sqlalchemy.engine.Engine [raw sql] ()
+novax-backend  | 2026-03-27 08:39:13,281 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+novax-backend  | 2026-03-27 08:39:13,281 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+novax-backend  | 2026-03-27 08:39:13,281 INFO sqlalchemy.engine.Engine [raw sql] ()
+novax-backend  | 2026-03-27 08:39:13,281 INFO sqlalchemy.engine.Engine [raw sql] ()
+novax-backend  | 2026-03-27 08:39:13,282 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+novax-backend  | 2026-03-27 08:39:13,282 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+novax-backend  | 2026-03-27 08:39:13,285 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+novax-backend  | FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+novax-backend  | WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+novax-backend  | 2026-03-27 08:39:13,285 INFO sqlalchemy.engine.Engine [generated in 0.00022s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+novax-backend  | 2026-03-27 08:39:13,285 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+novax-backend  | FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+novax-backend  | WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+novax-backend  | 2026-03-27 08:39:13,285 INFO sqlalchemy.engine.Engine [generated in 0.00030s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+novax-backend  | 2026-03-27 08:39:13,289 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+novax-backend  | FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+novax-backend  | WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+novax-backend  | 2026-03-27 08:39:13,289 INFO sqlalchemy.engine.Engine [cached since 0.00478s ago] ('predictions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+novax-backend  | 2026-03-27 08:39:13,289 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+novax-backend  | FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+novax-backend  | WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+novax-backend  | 2026-03-27 08:39:13,289 INFO sqlalchemy.engine.Engine [cached since 0.004746s ago] ('predictions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+novax-backend  | 2026-03-27 08:39:13,290 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+novax-backend  | FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+novax-backend  | WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+novax-backend  | 2026-03-27 08:39:13,290 INFO sqlalchemy.engine.Engine [cached since 0.005457s ago] ('holdings', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+novax-backend  | 2026-03-27 08:39:13,290 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+novax-backend  | FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+novax-backend  | WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+novax-backend  | 2026-03-27 08:39:13,290 INFO sqlalchemy.engine.Engine [cached since 0.005394s ago] ('holdings', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+novax-backend  | 2026-03-27 08:39:13,291 INFO sqlalchemy.engine.Engine COMMIT
+novax-backend  | 2026-03-27 08:39:13,291 INFO sqlalchemy.engine.Engine COMMIT
+novax-backend  | INFO:     Application startup complete.
+novax-backend  | INFO:     Application startup complete.
+novax-backend  |   ✅ PostgreSQL tables initialized
+novax-backend  |   ✅ Redis connected
+novax-backend  |   ✅ MongoDB connected
+novax-backend  | ✅ NovaX Backend started successfully
+novax-backend  | INFO:     127.0.0.1:48444 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:33910 - "GET /health HTTP/1.1" 200 OK
+novax-backend  |   ✅ PostgreSQL tables initialized
+novax-backend  |   ✅ Redis connected
+novax-backend  |   ✅ MongoDB connected
+novax-backend  | ✅ NovaX Backend started successfully
+novax-backend  | INFO:     127.0.0.1:60644 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:53142 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:35216 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:44498 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:42760 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:36580 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:60934 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:49052 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:51620 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:51740 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:54320 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:40180 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:51972 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:38378 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:49926 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:49710 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:50914 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:39720 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:51362 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:52952 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:48130 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:43558 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:34460 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:38508 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:51284 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:40624 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:41960 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:44940 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:48200 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:51782 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:46098 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:35834 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:57166 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:56060 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:59190 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:57386 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:33754 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:53390 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:51168 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:58080 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:54300 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:49700 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:52592 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:35722 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:34886 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:36450 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:42764 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:49802 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     172.18.0.1:57766 - "OPTIONS /api/predict/submit HTTP/1.1" 200 OK
+novax-backend  | INFO:     172.18.0.1:57766 - "POST /api/predict/submit HTTP/1.1" 401 Unauthorized
+novax-backend  | INFO:     127.0.0.1:60148 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:60862 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:52924 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:53038 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:37362 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:49610 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:50512 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:49066 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:49970 - "GET /health HTTP/1.1" 200 OK
+novax-backend  | INFO:     127.0.0.1:49812 - "GET /health HTTP/1.1" 200 OK

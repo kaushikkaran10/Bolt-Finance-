@@ -1,19 +1,23 @@
 """
 NovaX — Auth Router
-Handles user registration, login, Web3 auth, token refresh, logout.
+Handles user registration, login, Web3 auth, Firebase auth, token refresh, logout.
 JWT access (15m) + refresh (7d) tokens with Redis blacklist.
 """
 
 import uuid
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 
 import bcrypt
+import firebase_admin
+from firebase_admin import auth as firebase_auth, credentials as firebase_credentials
 import jwt
 from eth_account.messages import encode_defunct
 from web3 import Web3
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import BaseModel
 
 from config import get_settings
 from models import get_db
@@ -30,6 +34,27 @@ from schemas.auth import (
 
 router = APIRouter()
 settings = get_settings()
+
+
+# ========== Firebase Admin SDK init (singleton) ==========
+
+def _init_firebase():
+    """Initialize Firebase Admin SDK once."""
+    if firebase_admin._apps:
+        return  # Already initialized
+    if not settings.firebase_project_id:
+        return  # Firebase not configured — skip
+    cred = firebase_credentials.Certificate({
+        "type": "service_account",
+        "project_id": settings.firebase_project_id,
+        "client_email": settings.firebase_client_email,
+        "private_key": settings.firebase_private_key.replace("\\n", "\n"),
+        "token_uri": "https://oauth2.googleapis.com/token",
+    })
+    firebase_admin.initialize_app(cred)
+
+_init_firebase()
+
 
 
 # ========== Helpers ==========
@@ -296,3 +321,96 @@ async def logout(credentials: HTTPAuthorizationCredentials = Depends(security)):
 
     # Delete refresh token
     await redis.delete(f"auth:refresh:{user_id}")
+
+
+# ========== Firebase Auth Routes ==========
+
+class FirebaseAuthRequest(BaseModel):
+    uid: str
+    email: Optional[str] = None
+    name: Optional[str] = None
+    picture: Optional[str] = None
+
+
+class FirebaseTokenRequest(BaseModel):
+    id_token: str
+
+
+@router.post("/firebase", response_model=TokenResponse)
+async def firebase_login(request: FirebaseAuthRequest, db: AsyncSession = Depends(get_db)):
+    """Upsert Firebase-authenticated user in PostgreSQL and return NovaX JWTs."""
+    username = None
+    if request.email:
+        username = request.email.split("@")[0].replace(".", "_").lower()
+
+    result = await db.execute(select(User).where(User.firebase_uid == request.uid))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        if request.email:
+            result = await db.execute(select(User).where(User.email == request.email))
+            user = result.scalar_one_or_none()
+
+        if user:
+            user.firebase_uid = request.uid
+            if not user.avatar_url and request.picture:
+                user.avatar_url = request.picture
+        else:
+            base_username = username or f"user_{request.uid[:8]}"
+            final_username = base_username
+            counter = 1
+            while True:
+                res = await db.execute(select(User).where(User.username == final_username))
+                if not res.scalar_one_or_none():
+                    break
+                final_username = f"{base_username}_{counter}"
+                counter += 1
+
+            user = User(
+                email=request.email,
+                username=final_username,
+                firebase_uid=request.uid,
+                avatar_url=request.picture,
+            )
+            db.add(user)
+            await db.flush()
+
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Account deactivated")
+
+    access_token = create_access_token(user.id)
+    refresh_token = create_refresh_token(user.id)
+
+    redis = get_redis()
+    await redis.setex(
+        f"auth:refresh:{user.id}",
+        timedelta(days=settings.refresh_token_expire_days),
+        refresh_token,
+    )
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        user=UserResponse.model_validate(user),
+    )
+
+
+@router.post("/firebase/verify", response_model=TokenResponse)
+async def firebase_verify_and_login(
+    request: FirebaseTokenRequest, db: AsyncSession = Depends(get_db)
+):
+    """Client sends raw Firebase ID token; backend verifies and returns NovaX JWTs."""
+    if not firebase_admin._apps:
+        raise HTTPException(status_code=503, detail="Firebase not configured on server.")
+    try:
+        decoded = firebase_auth.verify_id_token(request.id_token)
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Firebase token invalid: {str(e)}")
+
+    firebase_request = FirebaseAuthRequest(
+        uid=decoded["uid"],
+        email=decoded.get("email"),
+        name=decoded.get("name"),
+        picture=decoded.get("picture"),
+    )
+    return await firebase_login(firebase_request, db)

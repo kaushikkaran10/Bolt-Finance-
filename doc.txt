@@ -1,0 +1,63 @@
+﻿docker :   File "<frozen 
+importlib._bootstrap>", line 
+690, in _load_unlocked
+At line:1 char:8
++ $err = docker logs --tail 
+20 novax-backend 2>&1; $err | 
+Out-File doc. ...
++        ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : 
+    NotSpecified: (  File "<  
+  frozen... _load_unlocked:   
+ String) [], RemoteExcepti    
+on
+    + FullyQualifiedErrorId : 
+    NativeCommandError
+ 
+  File "<frozen importlib._boo
+tstrap_external>", line 940, 
+in exec_module
+  File "<frozen 
+importlib._bootstrap>", line 
+241, in 
+_call_with_frames_removed
+  File "/app/main.py", line 
+14, in <module>
+    from models import 
+init_db, close_db
+  File 
+"/app/models/__init__.py", 
+line 15, in <module>
+    settings = get_settings()
+               ^^^^^^^^^^^^^^
+  File "/app/config.py", line 
+73, in get_settings
+    return Settings()
+           ^^^^^^^^^^
+  File "/root/.local/lib/pytho
+n3.11/site-packages/pydantic_s
+ettings/main.py", line 171, 
+in __init__
+    super().__init__(
+  File "/root/.local/lib/pytho
+n3.11/site-packages/pydantic/m
+ain.py", line 214, in __init__
+    validated_self = self.__py
+dantic_validator__.validate_py
+thon(data, self_instance=self)
+                     ^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.V
+alidationError: 1 validation 
+error for Settings
+pythonpath
+  Extra inputs are not 
+permitted 
+[type=extra_forbidden, 
+input_value='/app', 
+input_type=str]
+    For further information 
+visit https://errors.pydantic.
+dev/2.10/v/extra_forbidden

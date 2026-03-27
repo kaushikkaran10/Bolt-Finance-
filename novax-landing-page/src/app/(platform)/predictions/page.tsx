@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Target, Trophy, TrendingDown, BarChart2, RefreshCw, CheckCircle2, XCircle, Clock, ChevronUp, ChevronDown, Brain, TrendingUp, Zap } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 // ── Dummy data - all works offline ─────────────────────────────────────────
 const AI_FORECASTS = [
@@ -56,6 +57,7 @@ function CandleChart({ data }: { data: CandleType[] }) {
 const STOCKS = ["AAPL","NVDA","TSLA","MSFT","GOOGL","AMZN","META","BTC","ETH","SPY"];
 
 export default function PredictionsPage() {
+  const { novaxToken } = useAuth();
   const [selectedStock, setSelectedStock] = useState("NVDA");
   const [predDirection, setPredDirection] = useState<"Bullish" | "Bearish" | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -175,18 +177,44 @@ export default function PredictionsPage() {
   }, [ticker, currentPrice]);
 
 
-  const handleSubmit = () => {
-    if (!predDirection) return;
+  const handleSubmit = async () => {
+    if (!predDirection || !novaxToken) return;
     setSubmitted(true);
-    setTimeout(() => {
-      const result = Math.random() > 0.4 ? "correct" : "incorrect";
+    
+    try {
+      const res = await fetch("http://localhost:8000/api/predict/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${novaxToken}`,
+        },
+        body: JSON.stringify({
+          ticker: selectedStock,
+          direction: predDirection,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Prediction submission failed");
+
+      const data = await res.json();
+      
+      // Determine immediate outcome against the backend's instantaneous ML prediction
+      const result = data.ml_direction === predDirection ? "correct" : "incorrect";
+      
       setMyPredictions(prev => [{
-        ticker: selectedStock, direction: predDirection,
-        result, accuracy: 85, date: "Today"
+        ticker: selectedStock, 
+        direction: predDirection,
+        result, 
+        accuracy: Math.round(data.ml_confidence * 100) || 85, 
+        date: "Today"
       }, ...prev]);
+    } catch (err: any) {
+      console.error(err);
+      alert("Your session token has expired after 15 minutes! Please sign out from the top right menu and sign back in to continue submitting predictions.");
+    } finally {
       setSubmitted(false);
       setPredDirection(null);
-    }, 2000);
+    }
   };
 
   return (

@@ -97,6 +97,17 @@ class GeminiService:
         Non-streaming chat completion.
         Builds context → sends to Gemini → saves history → returns response.
         """
+        if not settings.gemini_api_key or settings.gemini_api_key == "your-gemini-api-key":
+            if "strict JSON object" in user_message:
+                import re
+                ticker_match = re.search(r'ticker:\s*([A-Z]+)', user_message)
+                ticker = ticker_match.group(1) if ticker_match else "STOCK"
+                price_match = re.search(r'price is \$([0-9.]+)', user_message)
+                price = float(price_match.group(1)) if price_match else 150.0
+                target = f"${(price * 1.05):.2f}"
+                return f'{{"direction": "Bullish", "target": "{target}", "conf": 88}}'
+            return "Demo mode is active. Please configure the GEMINI_API_KEY in the .env file to interact with the AI advisor."
+
         cls._init_model()
 
         # Get conversation history
@@ -141,6 +152,14 @@ class GeminiService:
         Streaming chat completion for SSE.
         Yields tokens one by one for Server-Sent Events.
         """
+        if not settings.gemini_api_key or settings.gemini_api_key == "your-gemini-api-key":
+            import asyncio
+            msg = "Demo mode is active. Please configure the GEMINI_API_KEY in the .env file to interact with the AI advisor."
+            for chunk in msg.split(" "):
+                yield chunk + " "
+                await asyncio.sleep(0.05)
+            return
+
         cls._init_model()
 
         history = await cls.get_conversation_history(user_id)

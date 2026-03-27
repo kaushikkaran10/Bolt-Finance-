@@ -75,6 +75,8 @@ export default function CommunityPage() {
   const [isConnected, setIsConnected] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState<string | null>(null);
   const [hoverMsg, setHoverMsg] = useState<string | null>(null);
+  const [typingBots, setTypingBots] = useState<string[]>([]);
+  const lastProcessedMsgRef = useRef<string | null>(null);
 
   const ws = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -129,6 +131,89 @@ export default function CommunityPage() {
       return () => { clearTimeout(timeout); socket.close(); };
     } catch { /* demo mode */ }
   }, [activeChannel, myUsername]);
+
+  // Chatbot Reply Logic (Hardcoded responses)
+  useEffect(() => {
+    const channelMessages = allMessages.filter(m => m.channel === activeChannel);
+    if (!channelMessages.length) return;
+    const lastMsg = channelMessages[channelMessages.length - 1];
+    
+    // Only trigger if it's a new user message
+    if (lastMsg.isOwn && lastMsg.id !== lastProcessedMsgRef.current) {
+      lastProcessedMsgRef.current = lastMsg.id;
+      
+      const bots = ONLINE_MEMBERS.filter(m => m.status === "online");
+      const bot = bots[Math.floor(Math.random() * bots.length)];
+      
+      const BOT_REPLIES = [
+        "Haha exactly what I thought.",
+        "Wouldn't bet on it right now, market is too choppy tbh.",
+        "Did you see the latest CPI print though?",
+        "Same, honestly.",
+        "I'm just holding spot BTC, no leverage for me today.",
+        "NVDA calls are printing today ngl 💸",
+        "Interesting take... but volume is dropping off.",
+        "I got stopped out holding that yesterday 💀",
+        "Agreed. 100%.",
+        "Watch the 4H close before committing size here.",
+        "Based.",
+        "Anyone got the alpha on the new Arbitrum yields?",
+        "Just DCA and vibe.",
+        "Could be a liquidity grab before the real move down.",
+        "This is why you don't fight the trend.",
+        "For sure, you're not wrong.",
+        "Wait for Powell to speak first lol",
+      ];
+      const randomReply = BOT_REPLIES[Math.floor(Math.random() * BOT_REPLIES.length)];
+
+      // Wait 1-3 seconds randomly before replying
+      const delay = Math.floor(Math.random() * 2000) + 1000;
+      setTypingBots(prev => [...prev, bot.name]);
+
+      setTimeout(() => {
+        setAllMessages(prev => [...prev, {
+          id: `bot-${Date.now()}`, username: bot.name, av: bot.av,
+          content: randomReply, timestamp: new Date(), channel: activeChannel, isOwn: false
+        }]);
+        setTypingBots(prev => prev.filter(n => n !== bot.name));
+      }, delay);
+    }
+  }, [allMessages, activeChannel]);
+
+  // Passive Bot dropping random observations
+  useEffect(() => {
+    const passiveInterval = setInterval(() => {
+       const bots = ONLINE_MEMBERS.filter(m => m.status === "online");
+       const bot = bots[Math.floor(Math.random() * bots.length)];
+       
+       const BOT_OBSERVATIONS = [
+        "BTC looking super heavy here at resistance.",
+        "Is it just me, or does the tape feel completely rigged today?",
+        "Just bought the dip on SOL. Let's send it. 🚀",
+        "If SPY loses 510 it's going into freefall.",
+        "ETH gas fees are finally reasonable for once.",
+        "Just closed my shorts. Not fighting this trend anymore.",
+        "Waiting for Powell to speak before placing any trades.",
+        "Yields are up again, equities probably going to suffer.",
+        "Who is actually buying these mid-curve NFTs right now? 😂",
+        "Market feels completely exhausted.",
+        "Massive block trade on MSFT just printed.",
+        "Can't believe TSLA is this cheap vs historical averages.",
+       ];
+       const randomObs = BOT_OBSERVATIONS[Math.floor(Math.random() * BOT_OBSERVATIONS.length)];
+
+       setTypingBots(prev => [...prev, bot.name]);
+       setTimeout(() => {
+         setAllMessages(prev => [...prev, {
+           id: `bot-passive-${Date.now()}`, username: bot.name, av: bot.av,
+           content: randomObs, timestamp: new Date(), channel: activeChannel, isOwn: false
+         }]);
+         setTypingBots(prev => prev.filter(n => n !== bot.name));
+       }, 1500); // Type for 1.5 seconds pseudo-realism
+    }, 25000); // 25 seconds
+
+    return () => clearInterval(passiveInterval);
+  }, [activeChannel]);
 
   const sendMessage = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -305,8 +390,17 @@ export default function CommunityPage() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input */}
-        <div className="px-6 py-4 border-t border-white/5 bg-black/20 flex-shrink-0">
+        <div className="px-6 py-4 border-t border-white/5 bg-black/20 flex-shrink-0 relative">
+          {typingBots.length > 0 && (
+            <div className="absolute -top-7 left-6 text-[10px] text-brand font-mono animate-pulse flex items-center gap-2 bg-black/40 px-3 py-1 rounded-t-lg border border-b-0 border-white/5">
+              <span className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-brand rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-1.5 h-1.5 bg-brand rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-1.5 h-1.5 bg-brand rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              </span>
+              {typingBots.join(", ")} {typingBots.length === 1 ? "is" : "are"} typing...
+            </div>
+          )}
           <form onSubmit={sendMessage} className="flex items-center gap-3">
             <div className="flex-1 relative">
               <input

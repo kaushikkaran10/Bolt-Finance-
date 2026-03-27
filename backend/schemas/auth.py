@@ -6,19 +6,19 @@ Request/response models for authentication endpoints.
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field, constr
 
 
 # --- Requests ---
 
 class RegisterRequest(BaseModel):
-    email: EmailStr
+    email: constr(pattern=r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
     username: str = Field(..., min_length=3, max_length=100)
     password: str = Field(..., min_length=8, max_length=128)
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: constr(pattern=r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
     password: str
 
 
@@ -39,6 +39,7 @@ class UserResponse(BaseModel):
     email: Optional[str] = None
     username: str
     wallet_address: Optional[str] = None
+    firebase_uid: Optional[str] = None
     avatar_url: Optional[str] = None
     is_active: bool
     created_at: datetime

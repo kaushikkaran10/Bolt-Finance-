@@ -5,8 +5,10 @@ import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MagneticButton } from "@/components/ui/magnetic-button";
+import { UserMenu } from "@/components/ui/user-menu";
 import { AnimatedGraph } from "@/components/ui/animated-graph";
 import { ArrowRight, ChevronRight, Shield, Zap, TrendingUp, Sparkles, Brain, Lock } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,6 +18,9 @@ export default function Home() {
   const triggerRef = useRef<HTMLDivElement>(null);
   const intelligenceRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
+
+  const { novaxToken, firebaseUser, loading } = useAuth();
+  const isAuthenticated = !!(novaxToken || firebaseUser);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -132,8 +137,14 @@ export default function Home() {
           <Link href="/community" className="hover:text-white transition-colors">Community</Link>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/login"><button className="text-sm font-medium hover:text-brand transition-colors">Sign In</button></Link>
-          <Link href="/login"><MagneticButton className="px-5 py-2 text-sm">Get Started</MagneticButton></Link>
+          {!loading && isAuthenticated ? (
+            <UserMenu />
+          ) : (
+            <>
+              <Link href="/login"><button className="text-sm font-medium hover:text-brand transition-colors">Sign In</button></Link>
+              <Link href="/login"><MagneticButton className="px-5 py-2 text-sm">Get Started</MagneticButton></Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -158,11 +169,19 @@ export default function Home() {
           </p>
 
           <div className="hero-actions mt-12 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            <Link href="/login" className="w-full sm:w-auto">
-              <MagneticButton className="w-full text-lg h-14 px-10">
-                Join the Future of Finance
-              </MagneticButton>
-            </Link>
+            {!loading && isAuthenticated ? (
+              <Link href="/dashboard" className="w-full sm:w-auto">
+                <MagneticButton className="w-full text-lg h-14 px-10">
+                  Go to Dashboard
+                </MagneticButton>
+              </Link>
+            ) : (
+              <Link href="/login" className="w-full sm:w-auto">
+                <MagneticButton className="w-full text-lg h-14 px-10">
+                  Join the Future of Finance
+                </MagneticButton>
+              </Link>
+            )}
           </div>
 
           <AnimatedGraph />
@@ -296,11 +315,19 @@ export default function Home() {
             Join 500,000+ investors using AI to make smarter, faster financial decisions.
           </p>
           <div className="cta-buttons flex flex-col sm:flex-row items-center justify-center gap-4 relative z-20">
-            <Link href="/login" className="w-full sm:w-auto">
-              <MagneticButton className="h-14 px-8 text-lg w-full">
-                Create Free Account
-              </MagneticButton>
-            </Link>
+            {!loading && isAuthenticated ? (
+              <Link href="/dashboard" className="w-full sm:w-auto">
+                <MagneticButton className="h-14 px-8 text-lg w-full">
+                  Go to Dashboard
+                </MagneticButton>
+              </Link>
+            ) : (
+              <Link href="/login" className="w-full sm:w-auto">
+                <MagneticButton className="h-14 px-8 text-lg w-full">
+                  Create Free Account
+                </MagneticButton>
+              </Link>
+            )}
           </div>
         </div>
       </section>

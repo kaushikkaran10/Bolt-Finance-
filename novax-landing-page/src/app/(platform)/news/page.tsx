@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { TrendingUp, TrendingDown, Minus, Newspaper, BarChart3, Radio, AlertCircle, Search, Filter } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Newspaper, BarChart3, Radio, AlertCircle, Search, Filter, X } from "lucide-react";
 import { apiClient } from "@/lib/api";
 import { toast, Toaster } from "react-hot-toast";
 
@@ -61,23 +61,11 @@ function timeAgo(isoDate: string) {
 // Custom Toast component to sync audio playback EXACTLY with DOM render
 const NewsToast = ({ 
   t, 
-  article, 
-  playSound, 
-  setArticles 
+  article
 }: { 
   t: any, 
-  article: Article, 
-  playSound: () => void,
-  setArticles: React.Dispatch<React.SetStateAction<Article[]>>
+  article: Article
 }) => {
-  useEffect(() => {
-    if (t.visible) {
-      playSound();
-      // Push the new article to the front of the list exactly as the toast renders
-      setArticles(prev => [article, ...prev]);
-    }
-  }, [t.visible, playSound, article, setArticles]);
-
   return (
     <div className={`glass-panel p-4 rounded-xl border border-brand/30 shadow-[0_0_20px_rgba(0,255,136,0.3)] min-w-[300px] flex items-start gap-4 ${t.visible ? 'animate-in slide-in-from-top-4 fade-in duration-300' : 'animate-out slide-out-to-right-4 fade-out duration-300'}`}>
        <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center shrink-0 border border-brand/20">
@@ -91,55 +79,65 @@ const NewsToast = ({
   );
 };
 
+// Play a clean UI "pop/ding" sound
+const playNotificationSound = () => {
+  if (typeof window === "undefined") return;
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    
+    const audioCtx = new AudioContextClass();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    // Pleasant "ding" setting
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+    oscillator.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); // A6 note
+    
+    // Volume envelope (quick attack, natural decay)
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.02);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+    
+    oscillator.start(audioCtx.currentTime);
+    oscillator.stop(audioCtx.currentTime + 0.5);
+  } catch (e) {
+    console.warn("Audio Context playback failed", e);
+  }
+};
+
 export default function NewsIntelligencePage() {
+  const [mounted, setMounted] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [articles, setArticles] = useState<Article[]>(ALL_DUMMY_ARTICLES);
   const [stats, setStats] = useState<SummaryStats | null>(SENTIMENT_SUMMARY);
   const [loading, setLoading] = useState(false); // No loading required for offline mode
   const [error, setError] = useState<string | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   
   // Ref for the unused incoming articles queue
   const queueRef = useRef(INCOMING_ARTICLES);
 
-  // Play a clean UI "pop/ding" sound
-  const playNotificationSound = () => {
-    try {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContextClass) return;
-      
-      const audioCtx = new AudioContextClass();
-      const oscillator = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      
-      // Pleasant "ding" setting
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
-      oscillator.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); // A6 note
-      
-      // Volume envelope (quick attack, natural decay)
-      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.02);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-      
-      oscillator.start(audioCtx.currentTime);
-      oscillator.stop(audioCtx.currentTime + 0.5);
-    } catch (e) {
-      console.warn("Audio Context playback failed", e);
-    }
-  };
-
   useEffect(() => {
+    setMounted(true);
     // Simulate real-time news arriving every 25 seconds
     const intervalId = setInterval(() => {
       if (queueRef.current.length > 0) {
         const nextArticle = queueRef.current.shift()!;
         
+        playNotificationSound();
+        setArticles(prev => {
+          if (prev.some(a => a.id === nextArticle.id)) return prev;
+          return [nextArticle, ...prev];
+        });
+
         // Trigger the Toast Notification!
-        toast.custom((t) => <NewsToast t={t} article={nextArticle} playSound={playNotificationSound} setArticles={setArticles} />, { duration: 5000, position: 'top-right' });
+        toast.custom((t) => <NewsToast t={t} article={nextArticle} />, { duration: 5000, position: 'top-right' });
       }
     }, 25000); // Trigger every 25 seconds
 
@@ -155,7 +153,7 @@ export default function NewsIntelligencePage() {
     return matchFilter && matchSearch;
   });
 
-  if (loading) {
+  if (!mounted || loading) {
     return (
       <div className="w-full max-w-7xl mx-auto flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
@@ -300,7 +298,11 @@ export default function NewsIntelligencePage() {
         ) : (
           <div className="space-y-4">
             {filtered.map((article) => (
-              <a key={article.id} href={article.url} target="_blank" rel="noopener noreferrer" className="block">
+              <button 
+                key={article.id} 
+                onClick={() => setSelectedArticle(article)} 
+                className="block w-full text-left focus:outline-none"
+              >
                 <div className="glass-panel p-5 rounded-xl border border-white/5 hover:border-brand/30 transition-all flex flex-col md:flex-row gap-5 group items-start md:items-center cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(0,255,136,0.1)]">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2 flex-wrap">
@@ -322,12 +324,8 @@ export default function NewsIntelligencePage() {
                   <h4 className="text-base font-bold text-white mb-2 group-hover:text-brand transition-colors line-clamp-2">{article.title}</h4>
                   <p className="text-sm text-gray-400 line-clamp-2">{article.summary || "No summary available."}</p>
                 </div>
-                <div className="md:border-l border-white/10 md:pl-5 flex flex-col gap-1 flex-shrink-0 min-w-20">
-                  <span className="text-xs text-gray-500 font-mono uppercase">Source</span>
-                  <span className="text-sm text-white font-medium">{article.source}</span>
                 </div>
-              </div>
-              </a>
+              </button>
             ))}
           </div>
         )}
@@ -338,6 +336,63 @@ export default function NewsIntelligencePage() {
         <Filter className="w-5 h-5 text-brand flex-shrink-0" />
         <span>Powered by <span className="text-white font-bold">ProsusAI/FinBERT</span> — classifies financial text into positive, negative, or neutral sentiment with confidence scoring.</span>
       </div>
+
+      {/* Inline Article Modal */}
+      {selectedArticle && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedArticle(null)} />
+          <div className="relative w-full max-w-2xl bg-[#0f1219] border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 text-left">
+            <div className="p-6 sm:p-8 text-left">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border ${
+                    selectedArticle.sentiment === "positive" ? "bg-brand/10 text-brand border-brand/20" :
+                    selectedArticle.sentiment === "negative" ? "bg-red-500/10 text-red-500 border-red-500/20" :
+                    "bg-gray-500/10 text-gray-400 border-gray-500/20"
+                  }`}>
+                    {selectedArticle.sentiment === "positive" ? <TrendingUp className="w-3 h-3 inline mr-1" /> : selectedArticle.sentiment === "negative" ? <TrendingDown className="w-3 h-3 inline mr-1" /> : <Minus className="w-3 h-3 inline mr-1" />}
+                    {selectedArticle.sentiment}
+                  </span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-gray-400 font-mono inline-flex items-center gap-1.5 px-2 py-0.5 bg-white/5 border border-white/10 rounded">
+                    <Radio className="w-3 h-3" />
+                    {selectedArticle.source}
+                  </span>
+                </div>
+                <button onClick={() => setSelectedArticle(null)} className="text-gray-500 hover:text-white transition-colors p-1 bg-white/5 rounded-lg hover:bg-white/10">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 leading-snug">
+                {selectedArticle.title}
+              </h2>
+              
+              <div className="prose prose-invert prose-brand max-w-none mb-8">
+                <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                  {selectedArticle.summary || "No extended summary available for this event."}
+                </p>
+                <div className="mt-8 p-4 rounded-xl bg-white/5 border border-white/10">
+                  <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                     <AlertCircle className="w-4 h-4 text-brand" /> FinBERT Analysis Engine
+                  </h4>
+                  <p className="text-xs text-gray-400 leading-relaxed font-mono">
+                    This article was analyzed by the platform's Natural Language Processing algorithms and mathematically flagged as generating a <strong className={selectedArticle.impact === "High" ? "text-amber-400" : "text-brand"}>{selectedArticle.impact} market momentum impact</strong> on correlating assets. The extracted sentiment bias is deeply classified as <strong className="uppercase">{selectedArticle.sentiment}</strong>.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t border-white/10 pt-6">
+                <button onClick={() => setSelectedArticle(null)} className="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-colors w-full sm:w-auto">
+                  Close Reading View
+                </button>
+                <a href={selectedArticle.url === "#" ? `https://news.google.com/search?q=${encodeURIComponent(selectedArticle.title)}` : selectedArticle.url} target="_blank" rel="noopener noreferrer" className="px-5 py-2.5 rounded-xl text-sm font-bold bg-brand text-black hover:bg-brand/90 transition-colors flex items-center justify-center gap-2 w-full sm:w-auto shadow-[0_0_15px_rgba(0,255,136,0.2)]">
+                  Research Source <TrendingUp className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
