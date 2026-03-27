@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { TrendingUp, TrendingDown, Minus, Newspaper, BarChart3, Radio, AlertCircle, Search, Filter, X } from "lucide-react";
-import { apiClient } from "@/lib/api";
 import { toast, Toaster } from "react-hot-toast";
 
 // ── Types ─────────────────────────────────────────────────────────────────
