@@ -1,0 +1,12 @@
+# RAILWAY BACKEND DEPLOYMENT - COPY-PASTE THESE ENV VARS
+
+# Step 1: In Railway Dashboard, go to Backend service → Variables
+# Step 2: Add each variable below
+# Step 3: Railway auto-sets DATABASE_URL, MONGODB_URL, REDIS_URL from services
+
+JWT_SECRET=NovaXSecure2024!@#$%^&*()_+-=[]{}|;:,.<>?/~`abcdefgh
+GOOGLE_API_KEY=AIzaSyDXGwktk-0bBjSDeiIwxFrKTAKDHAl0ZE0
+NEWS_API_KEY=a82a9720d04544218e897eace9d51ba8
+DEBUG=false
+APP_NAME=NovaX
+CORS_ORIGINS=["http://localhost:3000", "https://your-vercel-domain.vercel.app"]
