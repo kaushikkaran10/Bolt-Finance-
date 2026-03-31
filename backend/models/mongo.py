@@ -16,16 +16,20 @@ mongo_db: AsyncIOMotorDatabase | None = None
 async def init_mongo():
     """Initialize MongoDB async connection."""
     global mongo_client, mongo_db
-    mongo_client = AsyncIOMotorClient(settings.mongodb_url)
-    mongo_db = mongo_client[settings.mongodb_db_name]
+    try:
+        mongo_client = AsyncIOMotorClient(settings.mongodb_url)
+        mongo_db = mongo_client[settings.mongodb_db_name]
 
-    # Create indexes for efficient queries
-    news_collection = mongo_db["news_articles"]
-    await news_collection.create_index("published_at")
-    await news_collection.create_index("sentiment")
-    await news_collection.create_index("impact")
+        # Create indexes for efficient queries
+        news_collection = mongo_db["news_articles"]
+        await news_collection.create_index("published_at")
+        await news_collection.create_index("sentiment")
+        await news_collection.create_index("impact")
 
-    print("  ✅ MongoDB connected")
+        print("  ✅ MongoDB connected")
+    except Exception as e:
+        print(f"  ⚠️ MongoDB connection failed: {e}")
+        print("  → Continuing without MongoDB (non-critical feature)")
 
 
 async def close_mongo():
