@@ -27,13 +27,10 @@ if settings.sentry_dsn:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup & shutdown lifecycle hooks."""
-    # Startup
-    await init_db()
-    await init_redis()
-    await init_mongo()
+    # Startup - skip database initialization, do it lazily when endpoints are called
     print("✅ NovaX Backend started successfully")
     yield
-    # Shutdown
+    # Shutdown - close connections gracefully
     await close_db()
     await close_redis()
     await close_mongo()
