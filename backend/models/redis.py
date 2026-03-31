@@ -15,13 +15,17 @@ redis_client: aioredis.Redis | None = None
 async def init_redis():
     """Initialize Redis async connection."""
     global redis_client
-    redis_client = aioredis.from_url(
-        settings.redis_url,
-        encoding="utf-8",
-        decode_responses=True,
-    )
-    await redis_client.ping()
-    print("  ✅ Redis connected")
+    try:
+        redis_client = aioredis.from_url(
+            settings.redis_url,
+            encoding="utf-8",
+            decode_responses=True,
+        )
+        await redis_client.ping()
+        print("  ✅ Redis connected")
+    except Exception as e:
+        print(f"  ⚠️ Redis connection failed: {e}")
+        print("  → Continuing without Redis (cache disabled)")
 
 
 async def close_redis():

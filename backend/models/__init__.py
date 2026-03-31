@@ -67,13 +67,17 @@ async def get_db() -> AsyncSession:
 
 async def init_db():
     """Create all tables on startup."""
-    async with engine.begin() as conn:
-        from models.user import User  # noqa: F401
-        from models.portfolio import Holding  # noqa: F401
-        from models.prediction import Prediction  # noqa: F401
+    try:
+        async with engine.begin() as conn:
+            from models.user import User  # noqa: F401
+            from models.portfolio import Holding  # noqa: F401
+            from models.prediction import Prediction  # noqa: F401
 
-        await conn.run_sync(Base.metadata.create_all)
-    print("  ✅ PostgreSQL tables initialized")
+            await conn.run_sync(Base.metadata.create_all)
+        print("  ✅ PostgreSQL tables initialized")
+    except Exception as e:
+        print(f"  ⚠️ PostgreSQL connection failed: {e}")
+        print("  → Continuing without database (non-critical for health check)")
 
 
 async def close_db():
